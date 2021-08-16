@@ -12,6 +12,6 @@ public interface UserRegistrationRepository extends JpaRepository<UserRegistrati
 
 	Optional<UserRegistrationModel> findByotp(double otp);
 
-	//Optional<UserRegistrationModel> findByemail(String emailId);
+	Optional<UserRegistrationModel> findByEmailId(String email);
 
 }
