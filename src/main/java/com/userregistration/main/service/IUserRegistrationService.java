@@ -4,28 +4,27 @@ import org.springframework.stereotype.Service;
 
 import com.userregistration.main.dto.ResponseDTO;
 import com.userregistration.main.dto.UserRegistrationDTO;
-import com.userregistration.main.exceptions.InvalidDetailsException;
 
 @Service
 public interface IUserRegistrationService {
 
 	ResponseDTO addUser(UserRegistrationDTO userDTO);
 
-	ResponseDTO getUserById(int id) throws InvalidDetailsException;
+	ResponseDTO getUserById(int id);
 
 	ResponseDTO getAllUser();
 
 	ResponseDTO updateUserById(String token, UserRegistrationDTO userDTO);
 
-	ResponseDTO loginUser(String email, String password) throws InvalidDetailsException;
+	ResponseDTO loginUser(String email, String password);
 
-	ResponseDTO forgotPwd(String email) throws InvalidDetailsException;
+	ResponseDTO forgotPwd(String email);
 
 	ResponseDTO resetPassword();
 
 	Boolean verify(String token);
 
-	ResponseDTO verifyotp(String token, int otp) throws InvalidDetailsException;
+	ResponseDTO verifyotp(String token, int otp);
 
 	ResponseDTO delete(String token, int id);
 

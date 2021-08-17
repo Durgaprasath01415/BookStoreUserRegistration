@@ -1,8 +1,6 @@
 package com.userregistration.main.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import com.userregistration.main.dto.ResponseDTO;
 import com.userregistration.main.dto.UserRegistrationDTO;
-import com.userregistration.main.exceptions.InvalidDetailsException;
 import com.userregistration.main.exceptions.UserRegistrationException;
 import com.userregistration.main.model.UserRegistrationModel;
 import com.userregistration.main.repository.UserRegistrationRepository;
@@ -38,7 +35,7 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
 	}
 
 	@Override
-	public ResponseDTO getUserById(int id) throws InvalidDetailsException {
+	public ResponseDTO getUserById(int id) {
 		Optional<UserRegistrationModel> isUserPresent = userrepository.findById(id);
 		return new ResponseDTO("User of id:" + id, isUserPresent);
 	}
@@ -93,14 +90,14 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
 	}
 
 	@Override
-	public ResponseDTO loginUser( String email, String password) throws InvalidDetailsException {
+	public ResponseDTO loginUser( String email, String password){
 		Optional<UserRegistrationModel> isUserPresent = userrepository.findByEmailId(email);
 		if (isUserPresent.isPresent()) {
 			if (isUserPresent.get().getEmailId().equals(email) && isUserPresent.get().getPassword().equals(password)) {
 				String tokenForLogin = tokenutli.createToken(isUserPresent.get().getId());
 				return new ResponseDTO("Login is successfull", "Token :" + tokenForLogin);
 			} else {
-				throw new InvalidDetailsException(400,"Login failed");
+				throw new UserRegistrationException("Login failed", HttpStatus.OK, isUserPresent.get(), "false");
 			}
 		} else {
 			throw new UserRegistrationException("User id is not present", HttpStatus.OK, isUserPresent.get(), "false");
@@ -108,7 +105,7 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
 	}
 
 	@Override
-	public ResponseDTO forgotPwd(String email) throws InvalidDetailsException {
+	public ResponseDTO forgotPwd(String email){
 		Optional<UserRegistrationModel> isUserPresent = userrepository.findByEmailId(email);
 		if (isUserPresent.isPresent()) {
 			if (isUserPresent.get().getEmailId().equals(email)) {
@@ -117,7 +114,7 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
 				JMSUtli.sendEmail(isUserPresent.get().getEmailId(), "Reset Password", body);
 				return new ResponseDTO("Password is reset", body);
 			} else {
-				throw new InvalidDetailsException(400,"Email id is incorrect");
+				throw new UserRegistrationException("Email id is incorrect", HttpStatus.OK, isUserPresent.get(), "false");
 			}
 		} else {
 			throw new UserRegistrationException("User id is not present", HttpStatus.OK, null, "false");
@@ -131,19 +128,19 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
 	}
 
 	@Override
-	public Boolean verify(String token) {
+	public Boolean verify(String token){
 		int Id = tokenutli.decodeToken(token);
-		UserRegistrationModel verifyUser = userrepository.findById(Id)
-				.orElseThrow(() -> new UserRegistrationException(400, "User id is not present"));
+		Optional<UserRegistrationModel> verifyUser = userrepository.findById(Id);
 		if (verifyUser != null) {
 			return true;
+			
 		} else {
 			return false;
 		}
 	}
 
 	@Override
-	public ResponseDTO verifyotp(String token, int otp) throws InvalidDetailsException {
+	public ResponseDTO verifyotp(String token, int otp){
 		int Id = tokenutli.decodeToken(token);
 		Optional<UserRegistrationModel> isUserPresent = userrepository.findById(Id);
 		if (isUserPresent.isPresent()) {
@@ -152,7 +149,7 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
 				userrepository.save(isUserPresent.get());
 				return new ResponseDTO("OTP is Verifed");
 			} else {
-				throw new InvalidDetailsException(400,"OTP is incorrect");
+				throw new UserRegistrationException("OTP is incorrect", HttpStatus.OK, isUserPresent.get(), "false");
 			}
 		} else {
 			throw new UserRegistrationException("User id is not present", HttpStatus.OK, isUserPresent.get(), "false");
