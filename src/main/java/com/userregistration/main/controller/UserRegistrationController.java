@@ -1,5 +1,7 @@
 package com.userregistration.main.controller;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,10 +13,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.userregistration.main.dto.ResponseDTO;
 import com.userregistration.main.dto.UserRegistrationDTO;
 import com.userregistration.main.service.IUserRegistrationService;
+
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 public class UserRegistrationController {
@@ -89,6 +94,23 @@ public class UserRegistrationController {
 	@PutMapping("/expiry/{token}")
 	public ResponseEntity<ResponseDTO> expiry(@PathVariable String token){
 		ResponseDTO respDTO = userRegistrationService.expiry(token);
+		return new ResponseEntity<ResponseDTO>(respDTO, HttpStatus.OK);
+	}
+	
+	@GetMapping("/username/{token}")
+	public String userName(@PathVariable String token) {
+		return userRegistrationService.userName(token);
+	}
+	
+	@GetMapping("/userid/{token}")
+	public int userId(@PathVariable String token) {
+		return userRegistrationService.userId(token);
+	}
+	@PostMapping(value = "/uploadkyc/{token}/", consumes = { "multipart/form-data" })
+	@ApiOperation(value = "Upload Documents", response = ResponseDTO.class)
+	public ResponseEntity<ResponseDTO> addBankDetail(@PathVariable String token,
+			@RequestParam("kycFile") MultipartFile kycFile) throws IOException{
+		ResponseDTO respDTO = userRegistrationService.store(token, kycFile);
 		return new ResponseEntity<ResponseDTO>(respDTO, HttpStatus.OK);
 	}
 }

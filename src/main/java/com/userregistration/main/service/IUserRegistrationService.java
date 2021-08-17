@@ -1,6 +1,10 @@
 package com.userregistration.main.service;
 
+import java.io.IOException;
+
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 
 import com.userregistration.main.dto.ResponseDTO;
 import com.userregistration.main.dto.UserRegistrationDTO;
@@ -31,5 +35,12 @@ public interface IUserRegistrationService {
 	ResponseDTO purchase(String token);
 
 	ResponseDTO expiry(String token);
+
+	String userName(String token);
+
+	int userId(String token);
+	
+	ResponseDTO store(String token, MultipartFile kycFile)
+			throws IOException;
 
 }

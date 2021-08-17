@@ -1,5 +1,7 @@
 package com.userregistration.main.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.userregistration.main.dto.ResponseDTO;
 import com.userregistration.main.dto.UserRegistrationDTO;
@@ -70,6 +73,7 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
 			updateUser.get().setDateOfBirth(userDTO.getDateOfBirth());
 			updateUser.get().setEmailId(userDTO.getEmailId());
 			updateUser.get().setPassword(userDTO.getPassword());
+			updateUser.get().setUpdatedDate(LocalDate.now());
 			userrepository.save(updateUser.get());
 			return new ResponseDTO("Update of user details is successfull", updateUser);
 		} else {
@@ -189,6 +193,45 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
 		}else {
 			throw new UserRegistrationException("User id is not present", HttpStatus.OK, isUserPresent.get(), "false");
 			}
+	}
+	
+	@Override
+	public String userName(String token){
+		int Id = tokenutli.decodeToken(token);
+		Optional<UserRegistrationModel> verifyUser = userrepository.findById(Id);
+		if (verifyUser.isPresent()) {
+			return verifyUser.get().getFirstName();
+			
+		} else {
+			return "Incorrect user id";
+		}
+	}
+
+	@Override
+	public int userId(String token) {
+		int Id = tokenutli.decodeToken(token);
+		Optional<UserRegistrationModel> verifyUser = userrepository.findById(Id);
+		if (verifyUser.isPresent()) {
+			return Id;
+			
+		} else {
+			throw new UserRegistrationException("User id is not present", HttpStatus.OK, null, "false");
+		}
+	}
+	
+	@Override
+	public ResponseDTO store(String token, MultipartFile kycFile) throws IOException {
+		int Id = tokenutli.decodeToken(token);
+		Optional<UserRegistrationModel> isUserPresent = userrepository.findById(Id);
+		if (isUserPresent.isPresent()) {
+			File kyc = new File(kycFile.getOriginalFilename());
+			String panpath = kyc.getAbsolutePath();
+			isUserPresent.get().setKyc(panpath);
+			userrepository.save(isUserPresent.get());
+			return new ResponseDTO("File is successfully uploaded", isUserPresent.get());
+		} else {
+			throw new UserRegistrationException(400,"User is not present");
+		}
 	}
 }
 
