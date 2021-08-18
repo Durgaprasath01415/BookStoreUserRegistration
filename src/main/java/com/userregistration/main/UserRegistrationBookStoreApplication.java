@@ -8,8 +8,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @EnableEurekaClient
-@ComponentScan("com.userregistration.main")
-@EnableJpaRepositories("com.userregistration.main.repository")
 public class UserRegistrationBookStoreApplication {
 
 	public static void main(String[] args) {

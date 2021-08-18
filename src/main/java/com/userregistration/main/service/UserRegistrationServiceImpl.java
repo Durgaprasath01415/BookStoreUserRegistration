@@ -24,11 +24,11 @@ import com.userregistration.main.utli.TokenUtli;
 @Service
 public class UserRegistrationServiceImpl implements IUserRegistrationService {
 
-	@Autowired(required = true)
+	@Autowired
 	UserRegistrationRepository userrepository;
-	@Autowired(required = true)
+	@Autowired
 	TokenUtli tokenutli;
-	@Autowired(required = true)
+	@Autowired
 	ModelMapper modelmapper;
 	
 	@Override
@@ -194,18 +194,6 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
 			throw new UserRegistrationException("User id is not present", HttpStatus.OK, isUserPresent.get(), "false");
 			}
 	}
-	
-	@Override
-	public String userName(String token){
-		int Id = tokenutli.decodeToken(token);
-		Optional<UserRegistrationModel> verifyUser = userrepository.findById(Id);
-		if (verifyUser.isPresent()) {
-			return verifyUser.get().getFirstName();
-			
-		} else {
-			return "Incorrect user id";
-		}
-	}
 
 	@Override
 	public int userId(String token) {
@@ -213,7 +201,6 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
 		Optional<UserRegistrationModel> verifyUser = userrepository.findById(Id);
 		if (verifyUser.isPresent()) {
 			return Id;
-			
 		} else {
 			throw new UserRegistrationException("User id is not present", HttpStatus.OK, null, "false");
 		}

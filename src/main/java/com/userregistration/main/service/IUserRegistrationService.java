@@ -36,8 +36,6 @@ public interface IUserRegistrationService {
 
 	ResponseDTO expiry(String token);
 
-	String userName(String token);
-
 	int userId(String token);
 	
 	ResponseDTO store(String token, MultipartFile kycFile)

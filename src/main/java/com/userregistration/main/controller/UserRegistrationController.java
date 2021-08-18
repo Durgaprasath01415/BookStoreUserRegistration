@@ -97,15 +97,11 @@ public class UserRegistrationController {
 		return new ResponseEntity<ResponseDTO>(respDTO, HttpStatus.OK);
 	}
 	
-	@GetMapping("/username/{token}")
-	public String userName(@PathVariable String token) {
-		return userRegistrationService.userName(token);
-	}
-	
 	@GetMapping("/userid/{token}")
 	public int userId(@PathVariable String token) {
 		return userRegistrationService.userId(token);
 	}
+	
 	@PostMapping(value = "/uploadkyc/{token}/", consumes = { "multipart/form-data" })
 	@ApiOperation(value = "Upload Documents", response = ResponseDTO.class)
 	public ResponseEntity<ResponseDTO> addBankDetail(@PathVariable String token,
